@@ -46,6 +46,10 @@ public extension UINavigationController {
         button.setImage(image, for: .normal)
         button.addTarget(sideMenuController, action: #selector(SideMenuController.toggle), for: UIControlEvents.touchUpInside)
         
+        if let highligtedImage = SideMenuController.preferences.drawing.menuButtonHighlightedImage {
+            button.setImage(highligtedImage, for: .highlighted)
+        }
+        
         let item:UIBarButtonItem = UIBarButtonItem()
         item.customView = button
         
