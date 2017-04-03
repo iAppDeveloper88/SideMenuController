@@ -50,7 +50,8 @@ public extension UINavigationController {
         
         if let highligtedImage = SideMenuController.preferences.drawing.menuButtonHighlightedImage {
             button.setImage(highligtedImage, for: .highlighted)
-
+		}
+        
         if SideMenuController.preferences.drawing.sidePanelPosition.isPositionedLeft {
             let newItems = computeNewItems(sideMenuController: sideMenuController, button: button, controller: self.topViewController, positionLeft: true)
             self.topViewController?.navigationItem.leftBarButtonItems = newItems
