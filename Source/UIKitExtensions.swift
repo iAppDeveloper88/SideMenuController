@@ -23,6 +23,8 @@
 
 import Foundation
 
+let DefaultStatusBarHeight : CGFloat = 20
+
 extension UIView {
     class func panelAnimation(_ duration : TimeInterval, animations : @escaping (()->()), completion : (()->())? = nil) {
         UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: animations) { _ in
@@ -48,6 +50,28 @@ public extension UINavigationController {
         
         if let highligtedImage = SideMenuController.preferences.drawing.menuButtonHighlightedImage {
             button.setImage(highligtedImage, for: .highlighted)
+
+        if SideMenuController.preferences.drawing.sidePanelPosition.isPositionedLeft {
+            let newItems = computeNewItems(sideMenuController: sideMenuController, button: button, controller: self.topViewController, positionLeft: true)
+            self.topViewController?.navigationItem.leftBarButtonItems = newItems
+        } else {
+            let newItems = computeNewItems(sideMenuController: sideMenuController, button: button, controller: self.topViewController, positionLeft: false)
+            self.topViewController?.navigationItem.rightBarButtonItems = newItems
+        }
+        
+        completion?(button)
+    }
+    
+    private func computeNewItems(sideMenuController: SideMenuController, button: UIButton, controller: UIViewController?, positionLeft: Bool) -> [UIBarButtonItem] {
+        
+        var items: [UIBarButtonItem] = (positionLeft ? self.topViewController?.navigationItem.leftBarButtonItems :
+            self.topViewController?.navigationItem.rightBarButtonItems) ?? []
+        
+        for item in items {
+            if let button = item.customView as? UIButton,
+                button.allTargets.contains(sideMenuController) {
+                return items
+            }
         }
         
         let item:UIBarButtonItem = UIBarButtonItem()
@@ -56,13 +80,8 @@ public extension UINavigationController {
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
         spacer.width = -10
         
-        if SideMenuController.preferences.drawing.sidePanelPosition.isPositionedLeft {
-            self.topViewController?.navigationItem.leftBarButtonItems = [spacer, item]
-        }else{
-            self.topViewController?.navigationItem.rightBarButtonItems = [spacer, item]
-        }
-        
-        completion?(button)
+        items.append(contentsOf: positionLeft ? [spacer, item] : [item, spacer])
+        return items
     }
 }
 
@@ -77,7 +96,7 @@ extension UIWindow {
             }
         case .slideAnimation:
             animations = {
-                self.transform = hidden ? CGAffineTransform(translationX: 0, y: -20) : CGAffineTransform.identity
+                self.transform = hidden ? CGAffineTransform(translationX: 0, y: -1 * DefaultStatusBarHeight) : CGAffineTransform.identity
             }
         default:
             return
